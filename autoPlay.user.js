@@ -16,7 +16,7 @@
 	"use strict";
 
 // OPTIONS
-var clickRate = 10;
+var clickRate = 20;
 var logLevel = 1; // 5 is the most verbose, 0 disables all log
 
 var enableAutoClicker = getPreferenceBoolean("enableAutoClicker", true);
@@ -269,7 +269,7 @@ function MainLoop() {
 		useTreasureIfRelevant();
 		useMaxElementalDmgIfRelevant();
 
-		disableCooldownIfRelevant();
+		//disableCooldownIfRelevant();
 
 		updatePlayersInGame();
 		attemptRespawn();
@@ -1028,7 +1028,8 @@ function useClusterBombIfRelevant() {
 		}
 	}
 	//Bombs away if spawner and 2+ other monsters
-	if (enemySpawnerExists && enemyCount >= 3) {
+	var level = getGameLevel();
+	if (enemyCount >= 2 && level > 1000 && level % 10 === 0) {
 		triggerAbility(ABILITIES.CLUSTER_BOMB);
 	}
 }
@@ -1055,7 +1056,7 @@ function useNapalmIfRelevant() {
 		}
 	}
 	//Burn them all if spawner and 2+ other monsters
-	if (enemySpawnerExists && enemyCount >= 3) {
+	if (enemyCount >= 2 && level > 1000 && level % 10 === 0) {
 		triggerAbility(ABILITIES.NAPALM);
 	}
 }
@@ -1102,10 +1103,17 @@ function useTacticalNukeIfRelevant() {
 		}
 	}
 
-	// If there is a spawner and it's health is between 60% and 30%, nuke it!
-	if (enemySpawnerExists && enemySpawnerHealthPercent < 0.6 && enemySpawnerHealthPercent > 0.3) {
-		advLog("Tactical Nuke is purchased, cooled down, and needed. Nuke 'em.", 2);
-		triggerAbility(ABILITIES.NUKE);
+	var level = getGameLevel();
+	// Use nukes on boss when level >3000 for faster kills
+	if (level > 1000 && level % 200 !== 0 && level % 10 === 0) {
+		var enemy = s().GetEnemy(s().m_rgPlayerData.current_lane, s().m_rgPlayerData.target);
+		if (enemy && enemy.m_data.type == ENEMY_TYPE.BOSS) {
+			var enemyBossHealthPercent = enemy.m_flDisplayedHP / enemy.m_data.max_hp;
+			if (enemyBossHealthPercent>0.5){
+				advLog("Tactical Nuke is purchased, cooled down, and needed. Nuke 'em.", 2);
+				triggerAbility(ABILITIES.NUKE);
+			}
+		}
 	}
 }
 
