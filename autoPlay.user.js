@@ -268,6 +268,7 @@ function MainLoop() {
 		useReviveIfRelevant();
 		useTreasureIfRelevant();
 		useMaxElementalDmgIfRelevant();
+		useCooldownIfRelevant();
 
 		//disableCooldownIfRelevant();
 
@@ -853,6 +854,14 @@ function disableCooldownIfRelevant() {
 
 }
 
+function useCooldownIfRelevant() {
+	var level = getGameLevel();
+	// If we're in a boss level > 1000 AND COOLDOWN is not active, may as well use it?
+	if(getActiveAbilityLaneCount(ABILITIES.COOLDOWN) == 0
+		&& level > 1000 && level % 10 === 0) {
+		tryUsingAbility(ABILITIES.COOLDOWN);
+	}
+}
 function useCrippleMonsterIfRelevant() {
    // Check if Cripple Spawner is available
    if(hasItem(ITEMS.CRIPPLE_MONSTER)) {
