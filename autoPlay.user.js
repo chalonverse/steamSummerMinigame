@@ -935,7 +935,7 @@ function useClusterBombIfRelevant() {
 	}
 	//Bombs away if spawner and 2+ other monsters
 	var level = getGameLevel();
-	if (enemyCount >= 2 && level > 1000 && level % 10 === 0) {
+	if (enemyCount >= 2) {
 		triggerAbility(ABILITIES.CLUSTER_BOMB);
 	}
 }
@@ -962,7 +962,7 @@ function useNapalmIfRelevant() {
 		}
 	}
 	//Burn them all if spawner and 2+ other monsters
-	if (enemyCount >= 2 && level > 1000 && level % 10 === 0) {
+	if (enemyCount >= 2) {
 		triggerAbility(ABILITIES.NAPALM);
 	}
 }
