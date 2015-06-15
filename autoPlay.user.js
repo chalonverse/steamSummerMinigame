@@ -46,6 +46,9 @@ var trt_oldCrit = function() {};
 var trt_oldPush = function() {};
 var trt_oldRender = function() {};
 
+var gDate = null;
+var gUTCThrowTime = 15;
+
 var ABILITIES = {
 	"MORALE_BOOSTER": 5,
 	"GOOD_LUCK": 6,
@@ -228,6 +231,8 @@ function firstRun() {
 	ab_box.appendChild(lock_elements_box);
 	
 	enhanceTooltips();
+	
+	gDate = new Date();
 }
 
 function disableParticles() {
@@ -269,6 +274,7 @@ function MainLoop() {
 		useTreasureIfRelevant();
 		useMaxElementalDmgIfRelevant();
 		useCooldownIfRelevant();
+		useThrowMoneyIfRelevant();
 
 		//disableCooldownIfRelevant();
 
@@ -854,6 +860,22 @@ function disableCooldownIfRelevant() {
 
 }
 
+function useThrowMoneyIfRelevant() {
+	if (hasItem(ITEMS.THROW_MONEY)) {
+		var level = getGameLevel();
+		if (gDate && gDate.getUTCHours() == gUTCThrowTime && level % 10 == 0) {
+			var enemy = s().GetEnemy(s().m_rgPlayerData.current_lane, s().m_rgPlayerData.target);
+			if (enemy && enemy.m_data.type == ENEMY_TYPE.BOSS) {
+				var enemyBossHealthPercent = enemy.m_flDisplayedHP / enemy.m_data.max_hp;
+				if (enemyBossHealthPercent>0.5){
+					advLog("Crunch time, throw money!!", 2);
+					triggerItem(ITEMS.THROW_MONEY);
+				}
+			}
+		}
+	}
+}
+
 function useCooldownIfRelevant() {
 	var level = getGameLevel();
 	// If we're in a boss level > 1000 AND COOLDOWN is not active, may as well use it?
@@ -1342,6 +1364,15 @@ w.SteamDB_Minigame_Timer = w.setInterval(function(){
 		w.SteamDB_Minigame_Timer = w.setInterval(MainLoop, 1000);
 	}
 }, 1000);
+
+if(w.Date_Timer) {
+	w.clearInterval(w.Date_Timer);
+}
+
+// Update date once per minute
+w.Date_Timer = w.setInterval(function() {
+	gDate = new Date();
+}, 60000);
 
 // Append gameid to breadcrumbs
 var breadcrumbs = document.querySelector('.breadcrumbs');
